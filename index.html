@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rubick 翻译</title>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --panel: #ffffff;
+      --surface: #f8fafc;
+      --border: #e5e7eb;
+      --muted: #667085;
+      --accent: #3366ff;
+      --text: #1f2937;
+      --green: #16a34a;
+      --red: #ef4444;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0f111a;
+        --panel: #1b1e28;
+        --surface: #0e1017;
+        --border: #293243;
+        --muted: #a5adcb;
+        --accent: #7aa2f7;
+        --text: #e5e9f0;
+        --green: #9ece6a;
+        --red: #f7768e;
+      }
+    }
+    :root[data-theme="light"] {
+      --bg: #f6f7fb;
+      --panel: #ffffff;
+      --surface: #f8fafc;
+      --border: #e5e7eb;
+      --muted: #667085;
+      --accent: #3366ff;
+      --text: #1f2937;
+      --green: #16a34a;
+      --red: #ef4444;
+    }
+    :root[data-theme="dark"] {
+      --bg: #0f111a;
+      --panel: #1b1e28;
+      --surface: #0e1017;
+      --border: #293243;
+      --muted: #a5adcb;
+      --accent: #7aa2f7;
+      --text: #e5e9f0;
+      --green: #9ece6a;
+      --red: #f7768e;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    .container { padding: 12px; }
+    .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .panel { background: var(--panel); border-radius: 8px; padding: 10px; margin-bottom: 10px; }
+    label { color: var(--muted); font-size: 12px; }
+    select, input[type="text"], input[type="password"] {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 8px;
+      outline: none;
+    }
+    select:focus, input:focus, textarea:focus { border-color: var(--accent); }
+    button {
+      background: var(--accent);
+      color: #0b0e14;
+      border: none;
+      padding: 8px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button.secondary {
+      background: color-mix(in srgb, var(--accent) 15%, var(--surface));
+      color: var(--text);
+    }
+    button.danger { background: var(--red); color: #0b0e14; }
+    textarea {
+      width: 100%;
+      min-height: 110px;
+      resize: vertical;
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+    .cols { display: grid; grid-template-columns: 1fr; gap: 10px; }
+    .footer { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+    .history { max-height: 140px; overflow: auto; display: flex; flex-direction: column; gap: 8px; }
+    .history-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px;
+      cursor: pointer;
+    }
+    .history-item small { color: var(--muted); }
+    .inline { display: inline-flex; gap: 6px; align-items: center; }
+    .spacer { flex: 1 1 auto; }
+    .hint { color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .status { min-height: 18px; font-size: 12px; color: var(--red); }
+    .status.ok { color: var(--green); }
+    .badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 999px;
+      font-size: 11px;
+      background: color-mix(in srgb, var(--accent) 18%, var(--surface));
+      color: var(--accent);
+    }
+    @media (min-width: 860px) { .cols { grid-template-columns: 1fr 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="row panel">
+      <strong>Rubick 翻译</strong>
+      <span class="badge">免 Key</span>
+      <span class="hint">Google · 必应/微软</span>
+      <span class="spacer"></span>
+      <label class="inline">引擎
+        <select id="provider">
+          <option value="google">Google（免费）</option>
+          <option value="bing">必应 / 微软（免费）</option>
+        </select>
+      </label>
+      <label class="inline">主题
+        <select id="themeMode">
+          <option value="system">跟随系统</option>
+          <option value="light">浅色</option>
+          <option value="dark">深色</option>
+        </select>
+      </label>
+      <label class="inline" title="当前引擎失败时自动尝试其他引擎">
+        <input type="checkbox" id="autoFallback" checked />
+        自动切换
+      </label>
+    </div>
+
+    <div class="panel">
+      <div class="row" style="margin-bottom:8px;">
+        <label class="inline">源语言
+          <select id="sourceLang"></select>
+        </label>
+        <button class="secondary" id="swapLang" title="交换语言">⇄ 交换</button>
+        <label class="inline">目标语言
+          <select id="targetLang"></select>
+        </label>
+        <span class="spacer"></span>
+        <button id="doTranslate">翻译</button>
+      </div>
+      <div id="providerHint" class="hint" style="margin-bottom:8px;"></div>
+      <div class="cols">
+        <div>
+          <label for="input">原文</label>
+          <textarea id="input" placeholder="输入或粘贴待翻译文本…"></textarea>
+        </div>
+        <div>
+          <label for="output">译文</label>
+          <textarea id="output" readonly placeholder="翻译结果将显示在这里…"></textarea>
+        </div>
+      </div>
+      <div class="footer" style="margin-top:8px;">
+        <div id="status" class="status"></div>
+        <span class="spacer"></span>
+        <button class="secondary" id="copyResult">复制结果</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="row" style="margin-bottom:8px;">
+        <strong>历史记录</strong>
+        <span class="spacer"></span>
+        <button class="danger secondary" id="clearHistory">清空</button>
+      </div>
+      <div id="historyList" class="history"></div>
+    </div>
+  </div>
+
+  <script>
+    const RT = window.rubickTranslate;
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+    let systemListenerAttached = false;
+    let onSystemChange = null;
+    let providersMeta = {};
+
+    function resolveTheme(mode) {
+      if (mode === 'dark' || mode === 'light') return mode;
+      return prefersDark && prefersDark.matches ? 'dark' : 'light';
+    }
+
+    function applyTheme(mode) {
+      const finalMode = resolveTheme(mode);
+      document.documentElement.setAttribute('data-theme', finalMode);
+      try { document.documentElement.style.colorScheme = finalMode; } catch (_) {}
+      if (mode === 'system') attachSystemListener();
+      else detachSystemListener();
+    }
+
+    function attachSystemListener() {
+      if (!prefersDark || systemListenerAttached) return;
+      onSystemChange = () => applyTheme('system');
+      prefersDark.addEventListener('change', onSystemChange);
+      systemListenerAttached = true;
+    }
+
+    function detachSystemListener() {
+      if (!prefersDark || !systemListenerAttached) return;
+      prefersDark.removeEventListener('change', onSystemChange);
+      systemListenerAttached = false;
+    }
+
+    const LANGS = [
+      { code: 'auto', name: '自动检测' },
+      { code: 'zh', name: '中文' },
+      { code: 'en', name: 'English' },
+      { code: 'ja', name: '日本語' },
+      { code: 'ko', name: '한국어' },
+      { code: 'fr', name: 'Français' },
+      { code: 'de', name: 'Deutsch' },
+      { code: 'es', name: 'Español' },
+      { code: 'ru', name: 'Русский' },
+      { code: 'ar', name: 'العربية' },
+      { code: 'pt', name: 'Português' },
+      { code: 'it', name: 'Italiano' },
+      { code: 'hi', name: 'हिन्दी' }
+    ];
+
+    function fillSelect(select, options, value) {
+      select.innerHTML = '';
+      for (const opt of options) {
+        const o = document.createElement('option');
+        o.value = opt.code;
+        o.textContent = opt.name;
+        select.appendChild(o);
+      }
+      if (value) select.value = value;
+    }
+
+    function isChinese(text) {
+      return /[\u3400-\u9FBF]/.test(text);
+    }
+
+    function providerLabel(code) {
+      return providersMeta[code]?.label || code;
+    }
+
+    function updateProviderHint() {
+      const provider = document.getElementById('provider').value;
+      const meta = providersMeta[provider] || {};
+      document.getElementById('providerHint').textContent = meta.hint || '';
+    }
+
+    function setStatus(message, ok) {
+      const el = document.getElementById('status');
+      el.textContent = message || '';
+      el.className = ok ? 'status ok' : 'status';
+    }
+
+    async function renderHistory() {
+      const list = document.getElementById('historyList');
+      list.innerHTML = '';
+      const items = await RT.getHistory();
+      if (!items || items.length === 0) {
+        const div = document.createElement('div');
+        div.className = 'hint';
+        div.textContent = '暂无历史记录';
+        list.appendChild(div);
+        return;
+      }
+      for (const item of items) {
+        const div = document.createElement('div');
+        div.className = 'history-item';
+        div.innerHTML = `<div>${item.text ? item.text.slice(0, 120) : ''}</div><small>${item.source} → ${item.target} · ${providerLabel(item.provider)}</small>`;
+        div.addEventListener('click', () => {
+          const provider = item.provider === 'deeplx' ? 'google' : item.provider;
+          document.getElementById('provider').value = provider;
+          document.getElementById('sourceLang').value = item.source;
+          document.getElementById('targetLang').value = item.target;
+          document.getElementById('input').value = item.text;
+          document.getElementById('output').value = item.translated || '';
+          RT.setSubInputValue(item.text);
+          updateProviderHint();
+        });
+        list.appendChild(div);
+      }
+    }
+
+    async function doTranslate() {
+      const inp = document.getElementById('input');
+      const out = document.getElementById('output');
+      const provider = document.getElementById('provider').value;
+      let source = document.getElementById('sourceLang').value;
+      let target = document.getElementById('targetLang').value;
+      const text = inp.value.trim();
+      if (!text) {
+        out.value = '';
+        setStatus('');
+        return;
+      }
+      if (source === target && source !== 'auto') {
+        out.value = text;
+        setStatus('源语言与目标语言相同', true);
+        return;
+      }
+      if (source === 'auto') target = target || (isChinese(text) ? 'en' : 'zh');
+      setStatus('翻译中…', true);
+      try {
+        const res = await RT.translate({ text, provider, source, target });
+        out.value = res.translated || '';
+        if (res.detectedSource && document.getElementById('sourceLang').value === 'auto') {
+          document.getElementById('sourceLang').value = res.detectedSource;
+        }
+        setStatus(`完成 · ${providerLabel(res.provider || provider)}${res.fallbackFrom ? `（已从 ${providerLabel(res.fallbackFrom)} 自动切换）` : ''}`, true);
+        await renderHistory();
+      } catch (e) {
+        out.value = '';
+        const msg = e?.message || '翻译失败';
+        setStatus(msg);
+        RT.toast(msg);
+      }
+    }
+
+    function bindEvents() {
+      document.getElementById('doTranslate').addEventListener('click', doTranslate);
+      document.getElementById('copyResult').addEventListener('click', async () => {
+        const out = document.getElementById('output').value;
+        if (!out) return;
+        try {
+          await navigator.clipboard.writeText(out);
+          RT.toast('已复制');
+        } catch (_) {
+          RT.toast('复制失败');
+        }
+      });
+      document.getElementById('swapLang').addEventListener('click', async () => {
+        const s = document.getElementById('sourceLang');
+        const t = document.getElementById('targetLang');
+        if (s.value === 'auto') s.value = t.value === 'zh' ? 'en' : 'zh';
+        const temp = s.value;
+        s.value = t.value;
+        t.value = temp;
+        await RT.updateSettings({ lastSourceLang: s.value, lastTargetLang: t.value });
+        doTranslate();
+      });
+      document.getElementById('provider').addEventListener('change', async (e) => {
+        await RT.updateSettings({ lastProvider: e.target.value });
+        updateProviderHint();
+        doTranslate();
+      });
+      document.getElementById('sourceLang').addEventListener('change', async (e) => {
+        await RT.updateSettings({ lastSourceLang: e.target.value });
+        doTranslate();
+      });
+      document.getElementById('targetLang').addEventListener('change', async (e) => {
+        await RT.updateSettings({ lastTargetLang: e.target.value });
+        doTranslate();
+      });
+      document.getElementById('clearHistory').addEventListener('click', async () => {
+        await RT.clearHistory();
+        renderHistory();
+      });
+      document.getElementById('themeMode').addEventListener('change', async (e) => {
+        const val = e.target.value;
+        await RT.updateSettings({ themeMode: val });
+        applyTheme(val);
+      });
+      document.getElementById('autoFallback').addEventListener('change', async (e) => {
+        await RT.updateSettings({ autoFallback: e.target.checked });
+      });
+
+      const inputEl = document.getElementById('input');
+      let debounceTimer;
+      inputEl.addEventListener('input', (e) => {
+        RT.setSubInputValue(e.target.value);
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(doTranslate, 350);
+      });
+    }
+
+    async function bootstrap() {
+      await RT.ready();
+      const state = await RT.init();
+      providersMeta = state?.providers || {};
+
+      const themeMode = state?.settings?.themeMode || 'system';
+      document.getElementById('themeMode').value = themeMode;
+      applyTheme(themeMode);
+
+      fillSelect(document.getElementById('sourceLang'), LANGS, state?.settings?.lastSourceLang || 'auto');
+      fillSelect(document.getElementById('targetLang'), LANGS.filter((l) => l.code !== 'auto'), state?.settings?.lastTargetLang || 'zh');
+      const lastProvider = state?.settings?.lastProvider === 'deeplx' ? 'google' : (state?.settings?.lastProvider || 'google');
+      document.getElementById('provider').value = lastProvider;
+      document.getElementById('autoFallback').checked = state?.settings?.autoFallback !== false;
+      updateProviderHint();
+
+      RT.bindSubInput(({ text }) => {
+        document.getElementById('input').value = text || '';
+        if (text && text.trim()) doTranslate();
+      }, '输入待翻译文本…');
+
+      const enterText = RT.consumeEnterText();
+      if (enterText) {
+        document.getElementById('input').value = enterText;
+        RT.setSubInputValue(enterText);
+      }
+
+      bindEvents();
+      renderHistory();
+      if (enterText) doTranslate();
+    }
+
+    window.addEventListener('DOMContentLoaded', bootstrap);
+  </script>
+</body>
+</html>

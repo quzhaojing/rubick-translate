@@ -1,0 +1,29 @@
+{
+  "name": "rubick-translate",
+  "pluginName": "Rubick 翻译",
+  "description": "免 Key 双引擎翻译：Google / 必应·微软，开箱即用，支持引擎切换与自动 fallback",
+  "author": "rubick-translate",
+  "main": "index.html",
+  "logo": "https://raw.githubusercontent.com/quzhaojing/rubick-translate/master/logo.png",
+  "version": "1.2.5",
+  "scripts": {
+    "link": "npm link",
+    "unlink": "npm unlink -g rubick-translate",
+    "test:engines": "node test-engines.mjs",
+    "install:rubick": "node scripts/install-rubick.mjs"
+  },
+  "preload": "preload.js",
+  "homePage": "https://github.com/rubick-translate/rubick-translate",
+  "pluginType": "ui",
+  "features": [
+    {
+      "code": "translate",
+      "explain": "输入文本进行翻译，支持 Google / 必应 双引擎切换",
+      "cmds": [
+        "translate",
+        "翻译",
+        "译"
+      ]
+    }
+  ]
+}

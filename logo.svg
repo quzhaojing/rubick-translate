@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="32" y1="16" x2="168" y2="184" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#4F7CFF"/>
+      <stop offset="1" stop-color="#2B59FF"/>
+    </linearGradient>
+  </defs>
+  <rect width="200" height="200" rx="44" fill="url(#bg)"/>
+  <text x="52" y="118" font-family="Segoe UI, PingFang SC, Microsoft YaHei, sans-serif" font-size="52" font-weight="700" fill="#FFFFFF">A</text>
+  <text x="108" y="118" font-family="Segoe UI, PingFang SC, Microsoft YaHei, sans-serif" font-size="52" font-weight="700" fill="#FFFFFF">?</text>
+  <path d="M92 72H108" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round"/>
+  <path d="M100 64L108 72L100 80" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M108 64L100 72L108 80" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
