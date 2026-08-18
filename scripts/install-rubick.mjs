@@ -3,21 +3,21 @@
  * Rubick 命令列表不会解析 ./logo.png，相对路径会回退为 Rubick 默认图标。
  */
 import fs from 'fs';
+import os from 'os';
 import path from 'path';
 import { execSync } from 'child_process';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, '..');
-const rubickPluginsDir = path.join(
-  process.env.APPDATA || '',
-  'rubick',
-  'rubick-plugins-new'
-);
+const rubickUserData = process.platform === 'darwin'
+  ? path.join(os.homedir(), 'Library', 'Application Support', 'rubick')
+  : path.join(process.env.APPDATA || os.homedir(), 'rubick');
+const rubickPluginsDir = path.join(rubickUserData, 'rubick-plugins-new');
 const localPluginPath = path.join(rubickPluginsDir, 'rubick-local-plugin.json');
 
-function toFileUrl(windowsPath) {
-  return `file:///${windowsPath.replace(/\\/g, '/')}`;
+function toFileUrl(filePath) {
+  return pathToFileURL(filePath).href;
 }
 
 function readJson(p) {

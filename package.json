@@ -13,7 +13,7 @@
     "install:rubick": "node scripts/install-rubick.mjs"
   },
   "preload": "preload.js",
-  "homePage": "https://github.com/rubick-translate/rubick-translate",
+  "homePage": "https://github.com/quzhaojing/rubick-translate",
   "pluginType": "ui",
   "features": [
     {
