@@ -2,6 +2,8 @@
 
 Rubick 多引擎翻译插件，**开箱即用、无需 API Key**，支持 Google 与必应/微软双引擎切换。
 
+支持 Windows 与 macOS（Apple Silicon / Intel）。
+
 ## 特性
 
 - **Google（免费）**：调用 Google 公开翻译接口，安装即可使用
